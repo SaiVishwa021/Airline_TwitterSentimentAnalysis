@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Tweet Sentiment Analysis ✈️</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>✈️ Airline Tweet Sentiment Analysis</h1>
+            <p class="tagline">🛫 Elevate your flight experience analysis with AI! 🛬</p>
+        </header>
+
+        <section class="description">
+            <p>Welcome to your one-stop solution for understanding the sentiment behind airline-related tweets and reviews. Whether you're thrilled with a seamless journey or frustrated by delays, our AI-powered tool categorizes your input as <span class="negative">Negative</span> 😠, <span class="neutral">Neutral</span> 😐, or <span class="positive">Positive</span> 😊. This insight is invaluable for airlines aiming to enhance customer satisfaction and for passengers wanting to share their honest experiences.</p>
+        </section>
+
+        <section class="reviews">
+            <h2>Recent Tweets about our Airline 📝</h2>
+            <ul>
+                <li>"Flight was delayed for hours, no compensation offered!" </li>
+                <li>"@VirginAmerica I emailed your customer service team. Let me know if you need the tracking number." </li>
+                <li>"Amazing flight experience, will definitely fly again!" </li>
+            </ul>
+        </section>
+
+        <section class="form-section">
+            <form id="tweetForm">
+                <label for="tweet">Enter Your Tweet:</label><br>
+                <textarea id="tweet" name="tweet" rows="4" cols="50" placeholder="Type your tweet or review here..."></textarea><br><br>
+                <input type="submit" value="Analyze Sentiment">
+            </form>
+        </section>
+
+        <section class="output-section">
+            <p id="result" class="hidden">Sentiment Analysed: <span id="sentimentText"></span></p>
+        </section>
+    </div>
+
+    <script>
+        document.getElementById('tweetForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const tweet = document.getElementById('tweet').value;
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ tweet: tweet })
+            });
+
+            const result = await response.json();
+            const sentimentText = document.getElementById('sentimentText');
+            let sentimentColor;
+            
+            switch(result.sentiment) {
+                case 'Negative':
+                    sentimentColor = '#dc3545';
+                    break;
+                case 'Neutral':
+                    sentimentColor = '#ffc107';
+                    break;
+                case 'Positive':
+                    sentimentColor = '#28a745';
+                    break;
+                default:
+                    sentimentColor = '#fff';
+            }
+
+            sentimentText.textContent = result.sentiment;
+            sentimentText.style.color = sentimentColor;
+            sentimentText.style.fontSize = '1.5em';
+            sentimentText.style.fontWeight = 'bold';
+            document.getElementById('result').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
